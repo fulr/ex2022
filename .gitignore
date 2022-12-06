@@ -26,5 +26,3 @@ ex2022-*.tar
 /tmp/
 
 .elixir_ls
-
-input*.txt
