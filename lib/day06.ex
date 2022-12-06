@@ -1,17 +1,17 @@
 defmodule Day06 do
   def parse do
-    File.read!("input06.txt")
+    File.read!("input/input06.txt")
     |> String.to_charlist()
   end
 
   @doc """
   Part1
-  
+
   ## Examples
-  
+
     iex> Day06.part1()
-    70764
-  
+    [{'dcmv', 1080}]
+
   """
   def part1 do
     Day06.parse()
@@ -23,12 +23,12 @@ defmodule Day06 do
 
   @doc """
   Part2
-  
+
   ## Examples
-  
+
     iex> Day06.part2()
-    203905
-  
+    [{'sblmzdwqcrftvn', 3645}]
+
   """
   def part2 do
     Day06.parse()

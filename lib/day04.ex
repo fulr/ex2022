@@ -1,7 +1,7 @@
 defmodule Day04 do
   def parse do
-    File.read!("input04.txt")
-    |> String.split("\r\n")
+    File.read!("input/input04.txt")
+    |> String.split("\n")
     |> Enum.map(fn line ->
       line
       |> String.split(",")
@@ -11,12 +11,12 @@ defmodule Day04 do
 
   @doc """
   Part1
-  
+
   ## Examples
-  
+
     iex> Day04.part1()
     576
-  
+
   """
   def part1 do
     Day04.parse()
@@ -30,12 +30,12 @@ defmodule Day04 do
 
   @doc """
   Part2
-  
+
   ## Examples
-  
+
     iex> Day04.part2()
     905
-  
+
   """
   def part2 do
     Day04.parse()

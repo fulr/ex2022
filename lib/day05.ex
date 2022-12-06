@@ -1,9 +1,9 @@
 defmodule Day05 do
   def parse do
     [stacks, instructions] =
-      File.read!("input05.txt")
-      |> String.split("\r\n\r\n")
-      |> Enum.map(fn p -> String.split(p, "\r\n") end)
+      File.read!("input/input05.txt")
+      |> String.split("\n\n")
+      |> Enum.map(fn p -> String.split(p, "\n") end)
 
     parsed_stacks =
       stacks
@@ -51,12 +51,12 @@ defmodule Day05 do
 
   @doc """
   Part1
-  
+
   ## Examples
-  
+
     iex> Day05.part1()
     "RFFFWBPNS"
-  
+
   """
   def part1 do
     Day05.parse()
@@ -80,12 +80,12 @@ defmodule Day05 do
 
   @doc """
   Part2
-  
+
   ## Examples
-  
+
     iex> Day05.part2()
     "CQQBBJFCS"
-  
+
   """
   def part2 do
     Day05.parse()
