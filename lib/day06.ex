@@ -4,21 +4,26 @@ defmodule Day06 do
     |> String.to_charlist()
   end
 
+  def run(header_size) do
+    Day06.parse()
+    |> Enum.chunk_every(header_size, 1, :discard)
+    |> Enum.with_index(header_size)
+    |> Enum.filter(fn {x, _} -> MapSet.new(x) |> MapSet.size() == header_size end)
+    |> hd()
+    |> elem(1)
+  end
+
   @doc """
   Part1
 
   ## Examples
 
     iex> Day06.part1()
-    [{'dcmv', 1080}]
+    1080
 
   """
   def part1 do
-    Day06.parse()
-    |> Enum.chunk_every(4, 1, :discard)
-    |> Enum.with_index(4)
-    |> Enum.filter(fn {x, _} -> MapSet.new(x) |> MapSet.size() == 4 end)
-    |> Enum.take(1)
+    Day06.run(4)
   end
 
   @doc """
@@ -27,14 +32,10 @@ defmodule Day06 do
   ## Examples
 
     iex> Day06.part2()
-    [{'sblmzdwqcrftvn', 3645}]
+    3645
 
   """
   def part2 do
-    Day06.parse()
-    |> Enum.chunk_every(14, 1, :discard)
-    |> Enum.with_index(14)
-    |> Enum.filter(fn {x, _} -> MapSet.new(x) |> MapSet.size() == 14 end)
-    |> Enum.take(1)
+    Day06.run(14)
   end
 end
