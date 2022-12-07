@@ -46,7 +46,7 @@ defmodule Day07 do
   ## Examples
 
     iex> Day07.part1()
-    nil
+    2104783
 
   """
   def part1 do
@@ -68,10 +68,18 @@ defmodule Day07 do
 
   """
   def part2 do
-    dirs=Day07.parse()
-    |> Enum.reduce(%{}, &Day07.interpret/2)
-    |> Map.get(:dirs)
+    dirs =
+      Day07.parse()
+      |> Enum.reduce(%{}, &Day07.interpret/2)
+      |> Map.get(:dirs)
 
-    root=
+    root = Map.get(dirs, [])
+    free = 70_000_000 - root
+    to_be_freed = 30_000_000 - free
+
+    Map.values(dirs)
+    |> Enum.filter(&(&1 > to_be_freed))
+    |> Enum.sort()
+    |> hd()
   end
 end
