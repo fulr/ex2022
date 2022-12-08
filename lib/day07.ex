@@ -5,25 +5,11 @@ defmodule Day07 do
     |> String.split("\n")
   end
 
-  def interpret("$ cd /", _) do
-    %{cwd: [], dirs: %{}}
-  end
-
-  def interpret("$ cd ..", acc) do
-    %{acc | cwd: tl(acc.cwd)}
-  end
-
-  def interpret("$ cd " <> dir, acc) do
-    %{acc | cwd: [dir | acc.cwd]}
-  end
-
-  def interpret("$ ls", acc) do
-    acc
-  end
-
-  def interpret("dir " <> _, acc) do
-    acc
-  end
+  def interpret("$ cd /", _), do: %{cwd: [], dirs: %{}}
+  def interpret("$ cd ..", acc), do: %{acc | cwd: tl(acc.cwd)}
+  def interpret("$ cd " <> dir, acc), do: %{acc | cwd: [dir | acc.cwd]}
+  def interpret("$ ls", acc), do: acc
+  def interpret("dir " <> _, acc), do: acc
 
   def interpret(s, acc) do
     [a, _f] = String.split(s, " ")
@@ -64,7 +50,7 @@ defmodule Day07 do
   ## Examples
 
     iex> Day07.part2()
-    nil
+    5883165
 
   """
   def part2 do
