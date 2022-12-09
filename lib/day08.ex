@@ -53,7 +53,7 @@ defmodule Day08 do
   ## Examples
 
     iex> Day08.part2()
-    nil
+    671160
 
   """
   def part2 do

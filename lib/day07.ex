@@ -36,8 +36,8 @@ defmodule Day07 do
 
   """
   def part1 do
-    Day07.parse()
-    |> Enum.reduce(%{}, &Day07.interpret/2)
+    parse()
+    |> Enum.reduce(%{}, &interpret/2)
     |> Map.get(:dirs)
     |> Map.filter(fn {_k, v} -> v < 100_000 end)
     |> Map.values()
@@ -55,8 +55,8 @@ defmodule Day07 do
   """
   def part2 do
     dirs =
-      Day07.parse()
-      |> Enum.reduce(%{}, &Day07.interpret/2)
+      parse()
+      |> Enum.reduce(%{}, &interpret/2)
       |> Map.get(:dirs)
 
     root = Map.get(dirs, [])

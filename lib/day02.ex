@@ -1,5 +1,4 @@
 defmodule Day02 do
-
   def parse do
     File.read!("input/input02.txt")
     |> String.split("\n")
@@ -17,7 +16,6 @@ defmodule Day02 do
   def calc("C Y"), do: 2 + 0
   def calc("C Z"), do: 3 + 3
 
-
   @doc """
   Part1
 
@@ -28,11 +26,10 @@ defmodule Day02 do
 
   """
   def part1 do
-    Day02.parse()
+    parse()
     |> Enum.map(&calc/1)
     |> Enum.sum()
   end
-
 
   def calc2("A X"), do: 0 + 3
   def calc2("A Y"), do: 3 + 1
@@ -45,6 +42,7 @@ defmodule Day02 do
   def calc2("C X"), do: 0 + 2
   def calc2("C Y"), do: 3 + 3
   def calc2("C Z"), do: 6 + 1
+
   @doc """
   Part2
 
@@ -55,7 +53,7 @@ defmodule Day02 do
 
   """
   def part2 do
-    Day02.parse()
+    parse()
     |> Enum.map(&calc2/1)
     |> Enum.sum()
   end

@@ -5,7 +5,7 @@ defmodule Day06 do
   end
 
   def run(header_size) do
-    Day06.parse()
+    parse()
     |> Enum.chunk_every(header_size, 1, :discard)
     |> Enum.with_index(header_size)
     |> Enum.filter(fn {x, _} -> MapSet.new(x) |> MapSet.size() == header_size end)
@@ -23,7 +23,7 @@ defmodule Day06 do
 
   """
   def part1 do
-    Day06.run(4)
+    run(4)
   end
 
   @doc """
@@ -36,6 +36,6 @@ defmodule Day06 do
 
   """
   def part2 do
-    Day06.run(14)
+    run(14)
   end
 end

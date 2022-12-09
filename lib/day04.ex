@@ -19,8 +19,8 @@ defmodule Day04 do
 
   """
   def part1 do
-    Day04.parse()
-    |> Enum.filter(&Day04.filter/1)
+    parse()
+    |> Enum.filter(&filter/1)
     |> Enum.count()
   end
 
@@ -38,8 +38,8 @@ defmodule Day04 do
 
   """
   def part2 do
-    Day04.parse()
-    |> Enum.filter(&Day04.filter2/1)
+    parse()
+    |> Enum.filter(&filter2/1)
     |> Enum.count()
   end
 

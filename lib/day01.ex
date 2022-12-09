@@ -1,5 +1,4 @@
 defmodule Day01 do
-
   def parse do
     File.read!("input/input01.txt")
     |> String.split("\n\n")
@@ -10,6 +9,7 @@ defmodule Day01 do
     end)
     |> Enum.map(&Enum.sum/1)
   end
+
   @doc """
   Part1
 
@@ -20,7 +20,7 @@ defmodule Day01 do
 
   """
   def part1 do
-    Day01.parse()
+    parse()
     |> Enum.max()
   end
 
@@ -34,7 +34,7 @@ defmodule Day01 do
 
   """
   def part2 do
-    Day01.parse()
+    parse()
     |> Enum.sort(:desc)
     |> Enum.take(3)
     |> Enum.sum()

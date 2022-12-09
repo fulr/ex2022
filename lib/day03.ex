@@ -3,6 +3,7 @@ defmodule Day03 do
     File.read!("input/input03.txt")
     |> String.split("\n")
   end
+
   @doc """
   Part1
 
@@ -13,7 +14,7 @@ defmodule Day03 do
 
   """
   def part1 do
-    Day03.parse()
+    parse()
     |> Enum.map(&Day03.split_diff/1)
     |> Enum.map(&Day03.prio/1)
     |> Enum.sum()
@@ -48,7 +49,7 @@ defmodule Day03 do
 
   """
   def part2 do
-    Day03.parse()
+    parse()
     |> Enum.chunk_every(3)
     |> Enum.map(&Day03.diff/1)
     |> Enum.map(&Day03.prio/1)

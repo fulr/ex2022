@@ -34,11 +34,11 @@ defmodule Day05 do
   end
 
   def run({start, inst}) do
-    Enum.reduce(inst, start, &Day05.execute/2)
+    Enum.reduce(inst, start, &execute/2)
   end
 
   def execute([count, from, to], start) do
-    Enum.reduce(1..count, start, fn _, acc -> Day05.move(from, to, acc) end)
+    Enum.reduce(1..count, start, fn _, acc -> move(from, to, acc) end)
   end
 
   def move(from, to, stacks) do
@@ -59,13 +59,13 @@ defmodule Day05 do
 
   """
   def part1 do
-    Day05.parse()
-    |> Day05.run()
-    |> Day05.build_result()
+    parse()
+    |> run()
+    |> build_result()
   end
 
   def run2({start, inst}) do
-    Enum.reduce(inst, start, &Day05.execute2/2)
+    Enum.reduce(inst, start, &execute2/2)
   end
 
   def execute2([count, from, to], start) do
@@ -88,8 +88,8 @@ defmodule Day05 do
 
   """
   def part2 do
-    Day05.parse()
-    |> Day05.run2()
-    |> Day05.build_result()
+    parse()
+    |> run2()
+    |> build_result()
   end
 end
