@@ -1,8 +1,8 @@
 defmodule Day10 do
   def parse do
-    File.read!("input/input10.txt")
-    |> String.replace("\r\n", "\n")
-    |> String.split("\n")
+    File.stream!("input/input10.txt", [], :line)
+    |> Stream.map(&String.trim/1)
+    |> Stream.transform(1, &interpret/2)
   end
 
   @doc """
@@ -15,9 +15,7 @@ defmodule Day10 do
 
   """
   def part1 do
-    {signal, _} =
-      parse()
-      |> Enum.flat_map_reduce(1, &interpret/2)
+    signal = parse()
 
     [20, 60, 100, 140, 180, 220]
     |> Enum.map(fn c -> c * Enum.at(signal, c - 1) end)
@@ -42,13 +40,13 @@ defmodule Day10 do
 
   """
   def part2 do
-    {signal, _} =
-      parse()
-      |> Enum.flat_map_reduce(1, &interpret/2)
-
-    Enum.take(signal, 240)
+    parse()
+    |> Enum.take(240)
     |> Enum.with_index()
-    |> Enum.map(fn {reg, idx} -> if(abs(reg - rem(idx, 40)) <= 1, do: ?#, else: 32) end)
+    |> Enum.map(fn
+      {reg, idx} when rem(idx, 40) in (reg - 1)..(reg + 1) -> ?#
+      _ -> ?\s
+    end)
     |> Enum.chunk_every(40)
   end
 end
