@@ -34,7 +34,7 @@ defmodule Day12 do
   end
 
   def find_shortest_path(topo, dist, todo, visited, stop) do
-    current = Enum.min_by(todo, fn e -> Map.get(dist, e, 100_000_000) end)
+    current = Enum.min_by(todo, fn e -> Map.get(dist, e, :inf) end)
 
     if current == stop do
       dist[stop]
@@ -77,7 +77,7 @@ defmodule Day12 do
   ## Examples
 
     iex> Day12.part2()
-    nil
+    377
 
   """
   def part2 do
@@ -92,7 +92,7 @@ defmodule Day12 do
   end
 
   def find_shortest_path_rev(topo, dist, todo, visited) do
-    current = Enum.min_by(todo, fn e -> Map.get(dist, e, 100_000_000) end)
+    current = Enum.min_by(todo, fn e -> Map.get(dist, e, :inf) end)
 
     if topo[current] == ?a do
       dist[current]
