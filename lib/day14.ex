@@ -71,7 +71,7 @@ defmodule Day14 do
   ## Examples
 
     iex> Day14.part2()
-    nil
+    24166
 
   """
   def part2 do
