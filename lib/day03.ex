@@ -1,6 +1,7 @@
 defmodule Day03 do
   def parse do
     File.read!("input/input03.txt")
+    |> String.replace("\r\n", "\n")
     |> String.split("\n")
   end
 
