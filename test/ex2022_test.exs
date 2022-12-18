@@ -16,7 +16,7 @@ defmodule Ex2022Test do
   # doctest Day13
   # doctest Day14
   # doctest Day15
-  doctest Day16
+  # doctest Day16
   # doctest Day17
-  # doctest Day18
+  doctest Day18
 end

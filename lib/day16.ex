@@ -23,27 +23,47 @@ defmodule Day16 do
   ## Examples
 
     iex> Day16.part1()
-    nil
+    2077
 
   """
   def part1 do
     topo = parse() |> build_dist()
 
-    # |> find_best_path()
-    # |> Enum.map(&elem(&1, 1))
-    # |> Enum.max()
-
-    solve(topo, "AA", 30, MapSet.new(Map.keys(topo)))
+    solve(topo, {"AA", "AA"}, {30, 0}, MapSet.new(Map.keys(topo)))
   end
 
-  def solve(topo, valve, time_left, valvesLeft) do
+  @doc """
+  Part2
+
+  ## Examples
+
+    iex> Day16.part2()
+    2741
+
+  """
+  def part2 do
+    topo = parse() |> build_dist()
+
+    solve(topo, {"AA", "AA"}, {26, 26}, MapSet.new(Map.keys(topo)))
+  end
+
+  def solve(topo, {va, vb}, {ta, tb}, valves_left) when ta < tb,
+    do: solve(topo, {vb, va}, {tb, ta}, valves_left)
+
+  def solve(_topo, _valve, {ta, _tb}, _valves_left) when ta <= 0, do: 0
+
+  def solve(topo, {valve, other_valve}, {time_left, other_time_left}, valves_left) do
     %{rate: rate, dists: dists} = topo[valve]
     new_flow = rate * time_left
 
-    valvesLeft
-    |> Enum.filter(fn v -> time_left > dists[v] + 1 end)
+    valves_left
     |> Enum.map(fn v ->
-      solve(topo, v, time_left - dists[v] - 1, MapSet.delete(valvesLeft, v)) +
+      solve(
+        topo,
+        {v, other_valve},
+        {time_left - dists[v] - 1, other_time_left},
+        MapSet.delete(valves_left, v)
+      ) +
         new_flow
     end)
     |> Enum.max(fn -> new_flow end)
@@ -76,60 +96,5 @@ defmodule Day16 do
         Map.delete(acc, valve)
       end
     end)
-  end
-
-  def build_next(topo, {current_valve, current_budget, current_released_pressure, open_valves}) do
-    topo[current_valve].dists
-    |> Enum.filter(fn {k, _} -> k not in open_valves and topo[k].rate > 0 end)
-    |> Enum.map(fn {next_valve, dist} ->
-      new_budget = current_budget - dist - 1
-
-      {
-        next_valve,
-        new_budget,
-        current_released_pressure + new_budget * topo[next_valve].rate,
-        MapSet.put(open_valves, next_valve)
-      }
-    end)
-  end
-
-  def find_best_path(topo),
-    do: find_best_path(topo, build_next(topo, {"AA", 30, 0, MapSet.new()}), %{})
-
-  def find_best_path(_topo, [], result), do: result
-
-  def find_best_path(topo, todo, result) do
-    [current | rest] = todo
-    {_current_valve, current_budget, current_released_pressure, open_valves} = current
-
-    # rest = MapSet.delete(todo, current)
-
-    # IO.inspect(current)
-
-    if Map.get(result, open_valves, 0) < current_released_pressure and current_budget >= 0 do
-      find_best_path(
-        topo,
-        rest ++ build_next(topo, current),
-        Map.put(result, open_valves, current_released_pressure)
-      )
-    else
-      find_best_path(
-        topo,
-        rest,
-        result
-      )
-    end
-  end
-
-  @doc """
-  Part2
-
-  ## Examples
-
-    iex> Day16.part2()
-    nil
-
-  """
-  def part2 do
   end
 end
