@@ -1,6 +1,6 @@
 defmodule Day16 do
   def parse do
-    File.read!("input/input16.txt")
+    File.read!("input/input16t.txt")
     |> String.replace("\r\n", "\n")
     |> String.split("\n")
     |> Enum.map(fn l ->
@@ -80,15 +80,12 @@ defmodule Day16 do
         |> put_in([src, src], 0)
       end)
 
-    Enum.reduce(keys, dists, fn k, a ->
-      Enum.reduce(keys, a, fn i, b ->
-        Enum.reduce(keys, b, fn j, c ->
-          update_in(c, [i, j], fn x ->
-            min(x, (c[i][k] || 1_000_000) + (c[k][j] || 1_000_000))
-          end)
+    for k <- keys, i <- keys, j <- keys, reduce: dists do
+      c ->
+        update_in(c, [i, j], fn x ->
+          min(x, (c[i][k] || 1_000_000) + (c[k][j] || 1_000_000))
         end)
-      end)
-    end)
+    end
     |> Enum.reduce(topo, fn {valve, dists}, acc ->
       if acc[valve].rate > 0 or valve == "AA" do
         put_in(acc[valve].dists, dists)
