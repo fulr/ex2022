@@ -1,7 +1,7 @@
 defmodule Day22 do
   def parse do
     [m, i] =
-      File.read!("input/input23t.txt")
+      File.read!("input/input22t.txt")
       |> String.replace("\r\n", "\n")
       |> String.split("\n\n")
 
@@ -69,13 +69,34 @@ defmodule Day22 do
 
     start = Map.keys(map) |> Enum.min_by(fn {x, y} -> {y, x} end)
 
-    # {map_size(map), Day22.Part2.rotate(map) |> map_size ()}
-    map
-    |> Day22.Part2.rotate(1)
-    |> map_size()
+    map = Enum.map(map, fn {p, c} -> {p, %{p: p, c: c}} end) |> Map.new()
 
-    # Enum.reduce(inst, {start, ">"}, &Day22.Part2.move(&1, &2, map))
-    # |> password()
+    {pos, dir, final_map} = Enum.reduce(inst, {start, ">", map}, &Day22.Part2.move(&1, &2))
+
+    print(final_map)
+
+    IO.inspect(pos)
+
+    password({final_map[pos].p, dir})
+  end
+
+  def print(map) do
+    {x1, x2} = Enum.map(map, fn {{x, _}, _} -> x end) |> Enum.min_max()
+    {y1, y2} = Enum.map(map, fn {{_, y}, _} -> y end) |> Enum.min_max()
+
+    IO.inspect({x1, y1})
+
+    for y <- y1..y2 do
+      for x <- x1..x2 do
+        IO.write(get_in(map, [{x, y}, :c]) || " ")
+      end
+
+      IO.puts("")
+    end
+
+    IO.puts("")
+
+    map
   end
 
   defmodule Part1 do
@@ -173,174 +194,145 @@ defmodule Day22 do
   end
 
   defmodule Part2 do
-    def find_rotation_point(map) do
-      Map.keys(map)
-      |> Enum.filter(fn {x, y} ->
-        (Map.has_key?(map, {x + 1, y}) &&
-           Map.has_key?(map, {x, y + 1}) &&
-           !Map.has_key?(map, {x + 1, y + 1})) ||
-          (Map.has_key?(map, {x - 1, y}) &&
-             Map.has_key?(map, {x, y + 1}) &&
-             !Map.has_key?(map, {x - 1, y + 1})) ||
-          (Map.has_key?(map, {x + 1, y}) &&
-             Map.has_key?(map, {x, y - 1}) &&
-             !Map.has_key?(map, {x + 1, y - 1})) ||
-          (Map.has_key?(map, {x - 1, y}) &&
-             Map.has_key?(map, {x, y - 1}) &&
-             !Map.has_key?(map, {x - 1, y - 1}))
-      end)
-    end
-
     def rotate(map, 0) do
-      {ax, ay} =
-        Map.keys(map)
-        |> Enum.find(fn {x, y} ->
-          Map.has_key?(map, {x - 1, y}) &&
-            Map.has_key?(map, {x, y + 1}) &&
-            !Map.has_key?(map, {x - 1, y + 1})
-        end)
+      case Map.keys(map)
+           |> Enum.find(fn {x, y} ->
+             Map.has_key?(map, {x - 1, y}) &&
+               Map.has_key?(map, {x, y + 1}) &&
+               !Map.has_key?(map, {x - 1, y + 1})
+           end) do
+        nil ->
+          nil
 
-      {to_r, not_to_r} =
-        map
-        |> Enum.split_with(fn {{x, y}, _v} -> x < ax and y <= ay end)
+        {ax, ay} ->
+          {to_r, not_to_r} =
+            map
+            |> Enum.split_with(fn {{x, y}, _v} -> x < ax and y <= ay end)
 
-      to_r
-      |> Enum.sort()
-      |> Enum.map(fn {{x, y}, v} -> {{ax - 1 + y - ay, ay + (ax - x)}, v} end)
-      |> Map.new()
-      |> Map.merge(Map.new(not_to_r))
+          to_r
+          |> Enum.sort()
+          |> Enum.map(fn {{x, y}, v} -> {{ax - 1 + y - ay, ay + (ax - x)}, v} end)
+          # |> IO.inspect(label: "rot 0")
+          |> Map.new()
+          |> Map.merge(Map.new(not_to_r))
+      end
     end
 
     def rotate(map, 1) do
-      {ax, ay} =
-        Map.keys(map)
-        |> Enum.find(fn {x, y} ->
-          Map.has_key?(map, {x - 1, y}) &&
-            Map.has_key?(map, {x, y - 1}) &&
-            !Map.has_key?(map, {x - 1, y - 1})
-        end)
+      case Map.keys(map)
+           |> Enum.find(fn {x, y} ->
+             Map.has_key?(map, {x - 1, y}) &&
+               Map.has_key?(map, {x, y - 1}) &&
+               !Map.has_key?(map, {x - 1, y - 1})
+           end) do
+        nil ->
+          nil
 
-      {to_r, not_to_r} =
-        map
-        |> Enum.split_with(fn {{x, y}, _v} -> x >= ax and y < ay end)
+        {ax, ay} ->
+          {to_r, not_to_r} =
+            map
+            |> Enum.split_with(fn {{x, y}, _v} -> x >= ax and y < ay end)
 
-      to_r
-      |> Enum.sort()
-      |> Enum.map(fn {{x, y}, v} -> {{ax + y - ay, ay - 1 + (ax - x)}, v} end)
-      |> Map.new()
-      |> Map.merge(Map.new(not_to_r))
+          to_r
+          |> Enum.sort()
+          |> Enum.map(fn {{x, y}, v} -> {{ax + y - ay, ay - 1 + (ax - x)}, v} end)
+          # |> IO.inspect(label: "rot 1")
+          |> Map.new()
+          |> Map.merge(Map.new(not_to_r))
+      end
     end
 
     def rotate(map, 2) do
-      {ax, ay} =
-        Map.keys(map)
-        |> Enum.find(fn {x, y} ->
-          Map.has_key?(map, {x + 1, y}) &&
-            Map.has_key?(map, {x, y + 1}) &&
-            !Map.has_key?(map, {x + 1, y + 1})
-        end)
+      case Map.keys(map)
+           |> Enum.find(fn {x, y} ->
+             Map.has_key?(map, {x + 1, y}) &&
+               Map.has_key?(map, {x, y + 1}) &&
+               !Map.has_key?(map, {x + 1, y + 1})
+           end) do
+        nil ->
+          nil
 
-      {to_r, not_to_r} =
-        map
-        |> Enum.split_with(fn {{x, y}, _v} -> x <= ax and y < ay end)
+        {ax, ay} ->
+          {to_r, not_to_r} =
+            map
+            |> Enum.split_with(fn {{x, y}, _v} -> x <= ax and y > ay end)
 
-      to_r
-      |> Enum.sort()
-      |> Enum.map(fn {{x, y}, v} -> {{ax - 1 + y - ay, ay + (ax - x)}, v} end)
-      |> Map.new()
-      |> Map.merge(Map.new(not_to_r))
-    end
-
-    def move("R", {pos, ">"}, _map), do: {pos, "v"}
-    def move("R", {pos, "v"}, _map), do: {pos, "<"}
-    def move("R", {pos, "<"}, _map), do: {pos, "^"}
-    def move("R", {pos, "^"}, _map), do: {pos, ">"}
-
-    def move("L", {pos, ">"}, _map), do: {pos, "^"}
-    def move("L", {pos, "v"}, _map), do: {pos, ">"}
-    def move("L", {pos, "<"}, _map), do: {pos, "v"}
-    def move("L", {pos, "^"}, _map), do: {pos, "<"}
-
-    def move(0, state, _map), do: state
-
-    def move(dist, {pos, ">" = dir} = state, map) do
-      {x, y} = pos
-      pos_next = {x + 1, y}
-
-      next =
-        if Map.has_key?(map, pos_next) do
-          pos_next
-        else
-          Map.keys(map)
-          |> Enum.filter(fn {_, sy} -> sy == y end)
-          |> Enum.min_by(fn {sx, _} -> sx end)
-        end
-
-      if map[next] == "." do
-        move(dist - 1, {next, dir}, map)
-      else
-        state
+          to_r
+          |> Enum.sort()
+          |> Enum.map(fn {{x, y}, v} -> {{ax + y - ay, ay + 1 + (ax - x)}, v} end)
+          |> Map.new()
+          |> Map.merge(Map.new(not_to_r))
       end
     end
 
-    def move(dist, {pos, "<" = dir} = state, map) do
-      {x, y} = pos
-      pos_next = {x - 1, y}
+    def rotate(map, 3) do
+      case Map.keys(map)
+           |> Enum.find(fn {x, y} ->
+             Map.has_key?(map, {x + 1, y}) &&
+               Map.has_key?(map, {x, y - 1}) &&
+               !Map.has_key?(map, {x + 1, y - 1})
+           end) do
+        nil ->
+          nil
 
-      next =
-        if Map.has_key?(map, pos_next) do
-          pos_next
-        else
-          Map.keys(map)
-          |> Enum.filter(fn {_, sy} -> sy == y end)
-          |> Enum.max_by(fn {sx, _} -> sx end)
-        end
+        {ax, ay} ->
+          {to_r, not_to_r} =
+            map
+            |> Enum.split_with(fn {{x, y}, _v} -> x > ax and y >= ay end)
 
-      if map[next] == "." do
-        move(dist - 1, {next, dir}, map)
-      else
-        state
+          to_r
+          |> Enum.sort()
+          |> Enum.map(fn {{x, y}, v} -> {{ax + 1 + y - ay, ay + (ax - x)}, v} end)
+          |> Map.new()
+          |> Map.merge(Map.new(not_to_r))
       end
     end
 
-    def move(dist, {pos, "^" = dir} = state, map) do
-      {x, y} = pos
-      pos_next = {x, y - 1}
+    def move("R", {pos, ">", map}), do: {pos, "v", map}
+    def move("R", {pos, "v", map}), do: {pos, "<", map}
+    def move("R", {pos, "<", map}), do: {pos, "^", map}
+    def move("R", {pos, "^", map}), do: {pos, ">", map}
 
-      next =
-        if Map.has_key?(map, pos_next) do
-          pos_next
-        else
-          Map.keys(map)
-          |> Enum.filter(fn {sx, _} -> sx == x end)
-          |> Enum.max_by(fn {_, sy} -> sy end)
-        end
+    def move("L", {pos, ">", map}), do: {pos, "^", map}
+    def move("L", {pos, "v", map}), do: {pos, ">", map}
+    def move("L", {pos, "<", map}), do: {pos, "v", map}
+    def move("L", {pos, "^", map}), do: {pos, "<", map}
 
-      if map[next] == "." do
-        move(dist - 1, {next, dir}, map)
+    def move(0, state), do: state
+
+    def move(dist, {pos, dir, map}) do
+      next_pos = next(pos, dir)
+
+      next_map = juggle_map(map, pos, next_pos)
+
+      if next_map[next_pos].c == "." do
+        move(dist - 1, {next_pos, dir, next_map})
       else
-        state
+        {next_pos, dir, next_map}
       end
     end
 
-    def move(dist, {pos, "v" = dir} = state, map) do
-      {x, y} = pos
-      pos_next = {x, y + 1}
+    def juggle_map(map, current, next, r \\ 0) do
+      candidate = rotate(map, r)
 
-      next =
-        if Map.has_key?(map, pos_next) do
-          pos_next
-        else
-          Map.keys(map)
-          |> Enum.filter(fn {sx, _} -> sx == x end)
-          |> Enum.min_by(fn {_, sy} -> sy end)
-        end
+      cond do
+        Map.has_key?(map, current) && Map.has_key?(map, next) ->
+          map
 
-      if map[next] == "." do
-        move(dist - 1, {next, dir}, map)
-      else
-        state
+        is_nil(candidate) || !Map.has_key?(candidate, current) ->
+          juggle_map(map, current, next, rem(r + 1, 4))
+
+        Map.has_key?(candidate, current) && Map.has_key?(candidate, next) ->
+          candidate
+
+        true ->
+          juggle_map(candidate, current, next, r)
       end
     end
+
+    def next({x, y}, "v"), do: {x, y + 1}
+    def next({x, y}, "^"), do: {x, y - 1}
+    def next({x, y}, "<"), do: {x - 1, y}
+    def next({x, y}, ">"), do: {x + 1, y}
   end
 end
