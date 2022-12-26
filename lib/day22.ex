@@ -1,7 +1,7 @@
 defmodule Day22 do
   def parse do
     [m, i] =
-      File.read!("input/input22t.txt")
+      File.read!("input/input22.txt")
       |> String.replace("\r\n", "\n")
       |> String.split("\n\n")
 
@@ -61,7 +61,7 @@ defmodule Day22 do
   ## Examples
 
     iex> Day22.part2()
-    nil
+    189097
 
   """
   def part2 do
@@ -69,15 +69,8 @@ defmodule Day22 do
 
     start = Map.keys(map) |> Enum.min_by(fn {x, y} -> {y, x} end)
 
-    map = Enum.map(map, fn {p, c} -> {p, %{p: p, c: c}} end) |> Map.new()
-
-    {pos, dir, final_map} = Enum.reduce(inst, {start, ">", map}, &Day22.Part2.move(&1, &2))
-
-    print(final_map)
-
-    IO.inspect(pos)
-
-    password({final_map[pos].p, dir})
+    Enum.reduce(inst, {start, ">"}, &Day22.Part2.move(&1, &2, map))
+    |> password()
   end
 
   def print(map) do
@@ -194,145 +187,53 @@ defmodule Day22 do
   end
 
   defmodule Part2 do
-    def rotate(map, 0) do
-      case Map.keys(map)
-           |> Enum.find(fn {x, y} ->
-             Map.has_key?(map, {x - 1, y}) &&
-               Map.has_key?(map, {x, y + 1}) &&
-               !Map.has_key?(map, {x - 1, y + 1})
-           end) do
-        nil ->
-          nil
+    def move("R", {pos, ">"}, _), do: {pos, "v"}
+    def move("R", {pos, "v"}, _), do: {pos, "<"}
+    def move("R", {pos, "<"}, _), do: {pos, "^"}
+    def move("R", {pos, "^"}, _), do: {pos, ">"}
 
-        {ax, ay} ->
-          {to_r, not_to_r} =
-            map
-            |> Enum.split_with(fn {{x, y}, _v} -> x < ax and y <= ay end)
+    def move("L", {pos, ">"}, _), do: {pos, "^"}
+    def move("L", {pos, "v"}, _), do: {pos, ">"}
+    def move("L", {pos, "<"}, _), do: {pos, "v"}
+    def move("L", {pos, "^"}, _), do: {pos, "<"}
 
-          to_r
-          |> Enum.sort()
-          |> Enum.map(fn {{x, y}, v} -> {{ax - 1 + y - ay, ay + (ax - x)}, v} end)
-          # |> IO.inspect(label: "rot 0")
-          |> Map.new()
-          |> Map.merge(Map.new(not_to_r))
-      end
-    end
+    def move(0, state, _), do: state
 
-    def rotate(map, 1) do
-      case Map.keys(map)
-           |> Enum.find(fn {x, y} ->
-             Map.has_key?(map, {x - 1, y}) &&
-               Map.has_key?(map, {x, y - 1}) &&
-               !Map.has_key?(map, {x - 1, y - 1})
-           end) do
-        nil ->
-          nil
+    def move(dist, {pos, dir} = state, map) do
+      {next_pos, _} = n = next(pos, dir)
 
-        {ax, ay} ->
-          {to_r, not_to_r} =
-            map
-            |> Enum.split_with(fn {{x, y}, _v} -> x >= ax and y < ay end)
+      # IO.inspect(n)
 
-          to_r
-          |> Enum.sort()
-          |> Enum.map(fn {{x, y}, v} -> {{ax + y - ay, ay - 1 + (ax - x)}, v} end)
-          # |> IO.inspect(label: "rot 1")
-          |> Map.new()
-          |> Map.merge(Map.new(not_to_r))
-      end
-    end
+      # Map.has_key?(map, next_pos) || raise "t"
 
-    def rotate(map, 2) do
-      case Map.keys(map)
-           |> Enum.find(fn {x, y} ->
-             Map.has_key?(map, {x + 1, y}) &&
-               Map.has_key?(map, {x, y + 1}) &&
-               !Map.has_key?(map, {x + 1, y + 1})
-           end) do
-        nil ->
-          nil
-
-        {ax, ay} ->
-          {to_r, not_to_r} =
-            map
-            |> Enum.split_with(fn {{x, y}, _v} -> x <= ax and y > ay end)
-
-          to_r
-          |> Enum.sort()
-          |> Enum.map(fn {{x, y}, v} -> {{ax + y - ay, ay + 1 + (ax - x)}, v} end)
-          |> Map.new()
-          |> Map.merge(Map.new(not_to_r))
-      end
-    end
-
-    def rotate(map, 3) do
-      case Map.keys(map)
-           |> Enum.find(fn {x, y} ->
-             Map.has_key?(map, {x + 1, y}) &&
-               Map.has_key?(map, {x, y - 1}) &&
-               !Map.has_key?(map, {x + 1, y - 1})
-           end) do
-        nil ->
-          nil
-
-        {ax, ay} ->
-          {to_r, not_to_r} =
-            map
-            |> Enum.split_with(fn {{x, y}, _v} -> x > ax and y >= ay end)
-
-          to_r
-          |> Enum.sort()
-          |> Enum.map(fn {{x, y}, v} -> {{ax + 1 + y - ay, ay + (ax - x)}, v} end)
-          |> Map.new()
-          |> Map.merge(Map.new(not_to_r))
-      end
-    end
-
-    def move("R", {pos, ">", map}), do: {pos, "v", map}
-    def move("R", {pos, "v", map}), do: {pos, "<", map}
-    def move("R", {pos, "<", map}), do: {pos, "^", map}
-    def move("R", {pos, "^", map}), do: {pos, ">", map}
-
-    def move("L", {pos, ">", map}), do: {pos, "^", map}
-    def move("L", {pos, "v", map}), do: {pos, ">", map}
-    def move("L", {pos, "<", map}), do: {pos, "v", map}
-    def move("L", {pos, "^", map}), do: {pos, "<", map}
-
-    def move(0, state), do: state
-
-    def move(dist, {pos, dir, map}) do
-      next_pos = next(pos, dir)
-
-      next_map = juggle_map(map, pos, next_pos)
-
-      if next_map[next_pos].c == "." do
-        move(dist - 1, {next_pos, dir, next_map})
+      if map[next_pos] == "." do
+        move(dist - 1, n, map)
       else
-        {next_pos, dir, next_map}
+        state
       end
     end
 
-    def juggle_map(map, current, next, r \\ 0) do
-      candidate = rotate(map, r)
+    def next({x, y}, "^") when x in 1..50 and y == 101, do: {{51, 50 + x}, ">"}
+    def next({x, y}, "^") when x in 51..100 and y == 1, do: {{1, 150 + x - 50}, ">"}
+    def next({x, y}, "^") when x in 101..150 and y == 1, do: {{x - 100, 200}, "^"}
 
-      cond do
-        Map.has_key?(map, current) && Map.has_key?(map, next) ->
-          map
+    def next({x, y}, "v") when x in 1..50 and y == 200, do: {{x + 100, 1}, "v"}
+    def next({x, y}, "v") when x in 51..100 and y == 150, do: {{50, 150 + x - 50}, "<"}
+    def next({x, y}, "v") when x in 101..150 and y == 50, do: {{100, 50 + x - 100}, "<"}
 
-        is_nil(candidate) || !Map.has_key?(candidate, current) ->
-          juggle_map(map, current, next, rem(r + 1, 4))
+    def next({x, y}, ">") when y in 1..50 and x == 150, do: {{100, 151 - y}, "<"}
+    def next({x, y}, ">") when y in 51..100 and x == 100, do: {{100 + y - 50, 50}, "^"}
+    def next({x, y}, ">") when y in 101..150 and x == 100, do: {{150, 51 - (y - 100)}, "<"}
+    def next({x, y}, ">") when y in 151..200 and x == 50, do: {{50 + y - 150, 150}, "^"}
 
-        Map.has_key?(candidate, current) && Map.has_key?(candidate, next) ->
-          candidate
+    def next({x, y}, "<") when y in 1..50 and x == 51, do: {{1, 151 - y}, ">"}
+    def next({x, y}, "<") when y in 51..100 and x == 51, do: {{y - 50, 101}, "v"}
+    def next({x, y}, "<") when y in 101..150 and x == 1, do: {{51, 51 - (y - 100)}, ">"}
+    def next({x, y}, "<") when y in 151..200 and x == 1, do: {{50 + y - 150, 1}, "v"}
 
-        true ->
-          juggle_map(candidate, current, next, r)
-      end
-    end
-
-    def next({x, y}, "v"), do: {x, y + 1}
-    def next({x, y}, "^"), do: {x, y - 1}
-    def next({x, y}, "<"), do: {x - 1, y}
-    def next({x, y}, ">"), do: {x + 1, y}
+    def next({x, y}, "v"), do: {{x, y + 1}, "v"}
+    def next({x, y}, "^"), do: {{x, y - 1}, "^"}
+    def next({x, y}, "<"), do: {{x - 1, y}, "<"}
+    def next({x, y}, ">"), do: {{x + 1, y}, ">"}
   end
 end
